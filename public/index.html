@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#ECECEE">
+  <title>CatchFromU — YouTube 4K & MP3 Studio Downloader</title>
+  
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/favicon.svg">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+  <!-- Ambient Apple Lighting Glows -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Apple Translucent Glass Navigation Bar -->
+  <nav class="apple-nav">
+    <div class="nav-container">
+      <a href="/" class="brand-link">
+        <img src="/favicon.svg" alt="CatchFromU Logo" class="brand-icon">
+        <span>CatchFromU</span>
+      </a>
+      <div class="nav-actions">
+        <!-- Language Switcher Pill -->
+        <div class="lang-switch" aria-label="Language selector">
+          <button id="langThBtn" type="button" class="lang-btn active">TH</button>
+          <button id="langEnBtn" type="button" class="lang-btn">EN</button>
+        </div>
+
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span id="txtEngineStatus">Engine Active</span>
+        </div>
+
+        <button id="themeToggleBtn" type="button" class="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme">
+          <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3a6 6 0 0 0 9 9 9 0 1 1-9-9Z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-wrapper">
+    
+    <!-- Hero Section -->
+    <header class="hero-section">
+      <h1 class="hero-title">
+        <span class="gradient-text">CatchFromU.</span><br>
+        <span id="txtHeroTitle">จับทุกช่วงเวลาที่คุณชื่นชอบ</span>
+      </h1>
+      <p id="txtHeroSubtitle" class="hero-subtitle">
+        ดาวน์โหลดวิดีโอ YouTube คมชัดสูงสุดระดับ 4K Ultra HD และแยกไฟล์เสียง MP3 / AAC คุณภาพสตูดิโอ รวดเร็ว ปลอดภัย ไร้โฆษณา
+      </p>
+    </header>
+
+    <!-- Search / Input Capsule -->
+    <div class="search-capsule-wrapper">
+      <div class="search-capsule">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+        <input 
+          type="text" 
+          id="urlInput" 
+          class="search-input" 
+          placeholder="วางลิงก์ YouTube ที่นี่... (เช่น https://youtu.be/...)" 
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <div class="search-controls">
+          <button id="clearBtn" type="button" class="btn-clear" style="display: none;" title="Clear">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <button id="pasteBtn" type="button" class="btn-secondary-pill" title="Paste link">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            </svg>
+            <span id="txtPasteBtn">วาง</span>
+          </button>
+          <button id="catchBtn" type="button" class="btn-catch-primary">
+            <span id="txtCatchBtn">ค้นหาคลิป</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Samples -->
+    <div class="samples-row">
+      <span id="txtSamplesPrompt">ลองทดสอบคลิปตัวอย่าง:</span>
+      <button type="button" class="sample-chip" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Rick Astley (4K)</button>
+      <button type="button" class="sample-chip" data-url="https://youtu.be/FyS5dAywkEo">LISA - SaWaDiKa (4K)</button>
+      <button type="button" class="sample-chip" data-url="https://www.youtube.com/watch?v=jNQXAC9IVRw">Me at the zoo</button>
+    </div>
+
+    <!-- Alert / Error Toast -->
+    <div id="alertContainer"></div>
+
+    <!-- Loading Skeleton Capsule -->
+    <div id="loadingCapsule" class="loading-capsule" style="display: none;">
+      <div class="apple-spinner"></div>
+      <div id="txtLoadingTitle" style="font-weight: 500; font-size: 15px; color: var(--text-main);">กำลังตรวจสอบและดึงความละเอียดสูงสุด...</div>
+      <div id="txtLoadingSubtitle" style="font-size: 13px; color: var(--text-muted);">เชื่อมต่อกับ YouTube Content Delivery Network</div>
+    </div>
+
+    <!-- Video Studio Card (Dynamic Card) -->
+    <div id="videoStudioCard" class="video-card" style="display: none;">
+      <div class="video-overview">
+        <div class="thumb-container">
+          <img id="videoThumb" class="video-thumb" src="" alt="Video Thumbnail">
+          <span id="durationBadge" class="duration-badge">0:00</span>
+        </div>
+        <div class="video-details">
+          <h2 id="videoTitle" class="video-title">ชื่อวิดีโอ</h2>
+          <div class="channel-info">
+            <a id="channelLink" href="#" target="_blank" rel="noopener noreferrer" class="channel-name">
+              <span id="channelName">ชื่อช่อง</span>
+            </a>
+            <svg class="verified-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+          </div>
+          <div class="meta-row">
+            <span id="viewCountBadge" class="meta-chip">0 วิว</span>
+            <span id="dateBadge" class="meta-chip">วันที่</span>
+            <span class="meta-chip" style="color: var(--accent); font-weight: 600;">Ultra Clear</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Apple Segmented Switcher (Video vs Audio) -->
+      <div class="segmented-control-wrapper">
+        <button id="segmentVideo" type="button" class="segment-btn active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+          </svg>
+          <span id="txtSegmentVideo">วิดีโอพร้อมเสียง (MP4)</span>
+        </button>
+        <button id="segmentAudio" type="button" class="segment-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18V5l12-2v13"></path>
+            <circle cx="6" cy="18" r="3"></circle>
+            <circle cx="18" cy="16" r="3"></circle>
+          </svg>
+          <span id="txtSegmentAudio">ไฟล์เสียงอย่างเดียว (MP3 / AAC)</span>
+        </button>
+      </div>
+
+      <!-- Format Selection Grid -->
+      <div id="formatGrid" class="format-grid"></div>
+
+      <!-- Dynamic Download Progress HUD -->
+      <div id="downloadHud" class="download-hud" style="display: none;">
+        <div class="hud-header">
+          <div class="hud-stage-wrapper">
+            <div id="hudSpinner" class="hud-spinner"></div>
+            <div id="hudStage" class="hud-stage">กำลังเตรียมการดาวน์โหลด...</div>
+          </div>
+          <div class="hud-controls-right">
+            <div id="hudPercent" class="hud-percent">0%</div>
+            <button id="btnCancelDownload" type="button" class="btn-cancel-download" title="ยกเลิกการดาวน์โหลด" aria-label="Cancel download">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div id="hudProgressFill" class="progress-fill" style="width: 0%;"></div>
+        </div>
+        <div class="hud-footer">
+          <span id="hudSpeed">ความเร็ว: -- MB/s</span>
+          <span id="hudEta">เหลือเวลา: --:--</span>
+        </div>
+      </div>
+
+      <!-- Download Action Button -->
+      <button id="btnStartDownload" type="button" class="btn-download-action">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        <span id="downloadLabel">ดาวน์โหลดวิดีโอ (MP4)</span>
+      </button>
+    </div>
+
+    <!-- History Section (Stored Locally) -->
+    <div id="historySection" class="history-section" style="display: none;">
+      <div class="history-card">
+        <div class="history-header">
+          <div id="txtHistoryTitle" class="history-title">ประวัติการดาวน์โหลดล่าสุด</div>
+          <button id="clearHistoryBtn" type="button" class="btn-history-clear">ล้างประวัติ</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+      </div>
+    </div>
+
+    <!-- Apple Bento Feature Grid -->
+    <section class="bento-section">
+      <div class="section-heading">
+        <h2 id="txtBentoHeading" class="section-title">ประสิทธิภาพระดับมาสเตอร์พีซ</h2>
+        <p id="txtBentoSubheading" class="section-subtitle">ออกแบบมาเพื่อให้ทุกการดาวน์โหลดง่ายดาย สง่างาม และได้คุณภาพสูงสุด</p>
+      </div>
+      <div class="bento-grid">
+        <div class="bento-card">
+          <div class="bento-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+          </div>
+          <h3 id="txtBento1Title" class="bento-title">คมชัดสูงสุดระดับ 4K 60fps</h3>
+          <p id="txtBento1Desc" class="bento-desc">ผสานสตรีมภาพความละเอียดสูงกับสตรีมเสียงความคมชัดสูงสุดด้วย FFmpeg Engine อัตโนมัติ ให้ภาพสวยสมจริงไร้รอยต่อ</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <h3 id="txtBento2Title" class="bento-title">Studio Master Audio</h3>
+          <p id="txtBento2Desc" class="bento-desc">แปลงเป็นไฟล์เสียง MP3 บิตเรตสูงถึง 320 kbps หรือต้นฉบับ Apple AAC (.m4a) สำหรับฟังบน iPhone, iPad และ Mac</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+          </div>
+          <h3 id="txtBento3Title" class="bento-title">เทคโนโลยีสปีดเทอร์โบ</h3>
+          <p id="txtBento3Desc" class="bento-desc">ขับเคลื่อนด้วย yt-dlp พร้อมโปรโตคอลสตรีมมิ่งความเร็วสูงและการติดตามความคืบหน้าแบบ Real-time ผ่าน Server-Sent Events</p>
+        </div>
+
+        <div class="bento-card">
+          <div class="bento-icon-wrapper">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h3 id="txtBento4Title" class="bento-title">ความเป็นส่วนตัว 100%</h3>
+          <p id="txtBento4Desc" class="bento-desc">ไม่เก็บข้อมูล ไม่ต้องการการลงทะเบียน และระบบทำความสะอาดไฟล์ชั่วคราวจะลบไฟล์ทิ้งอัตโนมัติอย่างปลอดภัย</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Apple-style Footer -->
+    <footer class="apple-footer">
+      <div class="footer-nav">
+        <a id="txtFooterNav1" href="#videoStudioCard">ดาวน์โหลด</a>
+        <span>•</span>
+        <a id="txtFooterNav2" href="#historySection">ประวัติ</a>
+        <span>•</span>
+        <a id="txtFooterNav3" href="https://support.apple.com" target="_blank" rel="noopener">ช่วยเหลือ</a>
+      </div>
+      <p id="txtFooterCopy">© 2026 CatchFromU. สไตล์การออกแบบที่ได้แรงบันดาลใจจากปรัชญา Apple Design.</p>
+      <p id="txtFooterDisclaimer" style="margin-top: 4px; font-size: 11px;">เครื่องมือนี้สร้างขึ้นเพื่อการศึกษาและการใช้งานส่วนบุคคลตามข้อกำหนดสิทธิของเนื้อหา</p>
+    </footer>
+
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

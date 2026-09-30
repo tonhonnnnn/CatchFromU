@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Production/Downloads build
+downloads/*
+!downloads/.gitkeep
+
+# Logs and environment
+*.log
+.DS_Store
+
+# Media files
+*.mp4
+*.mp3
+*.m4a
+*.webm
+*.part
+*.ytdl
