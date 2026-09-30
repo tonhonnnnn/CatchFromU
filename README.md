@@ -60,10 +60,29 @@ npm run dev
 
 ---
 
+## ☁️ การนำขึ้น Cloud (Cloud Deployment)
+
+โปรเจกต์นี้มี `Dockerfile` และ `render.yaml` พร้อมสำหรับการนำขึ้น Cloud ฟรี:
+
+### ทางเลือกที่ 1: Deploy บน Render (แนะนำ - ฟรี & 1-Click)
+1. ไปที่ [Render Dashboard](https://dashboard.render.com/) แล้วเลือก **New > Web Service**
+2. เชื่อมต่อกับคลังโค้ด GitHub: `tonhonnnnn/CatchFromU`
+3. Render จะตรวจพบ `Dockerfile` และติดตั้ง `Node.js`, `yt-dlp` และ `ffmpeg` ให้โดยอัตโนมัติ
+4. กด **Deploy Web Service** รอประมาณ 2–3 นาที จะได้ URL `https://your-app.onrender.com` ใช้งานได้ตลอด 24 ชั่วโมง
+
+### ทางเลือกที่ 2: Deploy บน Railway
+1. ไปที่ [Railway Dashboard](https://railway.app/new)
+2. เลือก **Deploy from GitHub repo** > `tonhonnnnn/CatchFromU`
+3. Railway จะตรวจจับ `Dockerfile` และเปิดใช้งานทันที
+
+---
+
 ## 🛠 โครงสร้างโปรเจกต์ (Project Architecture)
 
 ```
 CatchfromU/
+├── Dockerfile           # คอนเทนเนอร์สำหรับ Deploy (รวม Node.js, yt-dlp และ FFmpeg)
+├── render.yaml          # Blueprint สำหรับ Deploy บน Render.com
 ├── server.js            # Express backend (yt-dlp, FFmpeg, SSE, Cancel endpoint)
 ├── package.json         # NPM dependencies & scripts
 ├── .gitignore           # Git ignore configuration
