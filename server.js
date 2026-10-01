@@ -84,6 +84,29 @@ function sanitizeFilename(name) {
     .substring(0, 120);
 }
 
+// Detect platform from URL
+function detectPlatform(url) {
+  const u = (url || '').toLowerCase();
+  if (/(?:youtube\.com|youtu\.be)/.test(u)) return 'youtube';
+  if (/(?:tiktok\.com)/.test(u)) return 'tiktok';
+  if (/(?:instagram\.com)/.test(u)) return 'instagram';
+  if (/(?:facebook\.com|fb\.watch)/.test(u)) return 'facebook';
+  if (/(?:twitter\.com|x\.com)/.test(u)) return 'twitter';
+  if (/(?:soundcloud\.com)/.test(u)) return 'soundcloud';
+  if (/(?:pinterest\.com|pin\.it)/.test(u)) return 'pinterest';
+  return 'general';
+}
+
+// Clean time input (e.g. "01:30", "1:30", "90", "00:01:30") to valid yt-dlp section string
+function sanitizeTime(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return '';
+  const trimmed = timeStr.trim();
+  if (/^(\d{1,2}:)?\d{1,2}:\d{2}$/.test(trimmed) || /^\d+(\.\d+)?$/.test(trimmed)) {
+    return trimmed;
+  }
+  return '';
+}
+
 // Parse yt-dlp error output
 function parseYtDlpError(stderr, lang = 'th') {
   const text = (stderr || '').toLowerCase();
@@ -94,15 +117,15 @@ function parseYtDlpError(stderr, lang = 'th') {
     return lang === 'en' ? 'Video is unavailable or has been removed.' : 'ไม่พบวิดีโอนี้ หรือวิดีโอถูกลบออกไปแล้ว';
   }
   if (text.includes('sign in to confirm') || text.includes('bot')) {
-    return lang === 'en' ? 'YouTube requires bot verification for this video. Please try again shortly.' : 'YouTube ตรวจพบความถี่การดาวน์โหลด กรุณารอสักครู่แล้วลองใหม่อีกครั้ง';
+    return lang === 'en' ? 'Bot verification required by provider. Please try again in a few moments.' : 'ระบบตรวจพบความถี่การดาวน์โหลด กรุณารอสักครู่แล้วลองใหม่อีกครั้ง';
   }
   if (text.includes('members-only')) {
-    return lang === 'en' ? 'This video is for channel members only.' : 'วิดีโอนี้สำหรับสมาชิกช่องเท่านั้น (Members-only)';
+    return lang === 'en' ? 'This video is for channel members only.' : 'วิดีโอนี้สำหรับสมาชิกเท่านั้น (Members-only)';
   }
   if (text.includes('live event') || text.includes('live stream')) {
     return lang === 'en' ? 'Live streams cannot be downloaded until finished.' : 'ไม่รองรับการดาวน์โหลดการถ่ายทอดสดที่ยังไม่สิ้นสุด';
   }
-  return lang === 'en' ? 'Download error occurred. Please try again.' : 'เกิดข้อผิดพลาดในการดาวน์โหลด กรุณาลองใหม่อีกครั้ง';
+  return lang === 'en' ? 'Download error occurred. Please verify link and try again.' : 'เกิดข้อผิดพลาดในการตรวจสอบคลิป กรุณาตรวจสอบลิงก์แล้วลองใหม่อีกครั้ง';
 }
 
 // 1. GET /api/info - Fetch video info
@@ -110,17 +133,18 @@ app.get('/api/info', async (req, res) => {
   const { url, lang = 'th' } = req.query;
   if (!url || typeof url !== 'string') {
     return res.status(400).json({
-      error: lang === 'en' ? 'Please provide a YouTube video URL.' : 'กรุณากรอก YouTube URL'
+      error: lang === 'en' ? 'Please provide a video URL.' : 'กรุณากรอก URL วิดีโอ'
     });
   }
 
   const cleanUrl = url.trim();
+  const platform = detectPlatform(cleanUrl);
 
-  // Comprehensive URL verification
-  const isYoutube = /(?:https?:\/\/)?(?:www\.|m\.|music\.)?(?:youtube\.com\/(?:watch\?|shorts\/|live\/|embed\/|v\/)|youtu\.be\/)/i.test(cleanUrl);
-  if (!isYoutube) {
+  // Validate URL format
+  const isValidUrl = /^https?:\/\//i.test(cleanUrl);
+  if (!isValidUrl) {
     return res.status(400).json({
-      error: lang === 'en' ? 'Please enter a valid YouTube link (e.g. youtube.com, youtu.be, shorts or music.youtube.com).' : 'กรุณาใส่ลิงก์ YouTube ที่ถูกต้อง (เช่น youtube.com, youtu.be, shorts หรือ music.youtube.com)'
+      error: lang === 'en' ? 'Please enter a valid link (e.g. YouTube, TikTok, Instagram, Facebook, X).' : 'กรุณาใส่ลิงก์ที่ถูกต้อง (เช่น YouTube, TikTok, Instagram, Facebook, X)'
     });
   }
 
@@ -165,10 +189,11 @@ app.get('/api/info', async (req, res) => {
       const formats = data.formats || [];
       const videoOptions = [];
 
-      // Sort formats by height descending
-      const videoFormats = formats.filter(f => f.vcodec && f.vcodec !== 'none' && f.height);
-      videoFormats.sort((a, b) => (b.height || 0) - (a.height || 0));
+      // Sort formats by pixel count or height descending
+      const videoFormats = formats.filter(f => f.vcodec && f.vcodec !== 'none');
+      videoFormats.sort((a, b) => ((b.height || 0) * (b.width || 0)) - ((a.height || 0) * (a.width || 0)));
 
+      const isTikTok = platform === 'tiktok';
       const standardHeights = [4320, 2160, 1440, 1080, 720, 480, 360];
       
       for (const h of standardHeights) {
@@ -180,8 +205,8 @@ app.get('/api/info', async (req, res) => {
           if (h >= 4320) { label = '8K (4320p)'; badge = 'Ultra HD'; }
           else if (h >= 2160) { label = '4K (2160p)'; badge = 'Ultra HD'; }
           else if (h >= 1440) { label = '2K (1440p)'; badge = 'QHD'; }
-          else if (h >= 1080) { label = fps >= 50 ? '1080p 60fps' : '1080p'; badge = 'Full HD'; }
-          else if (h >= 720) { label = fps >= 50 ? '720p 60fps' : '720p'; badge = 'HD'; }
+          else if (h >= 1080) { label = fps >= 50 ? '1080p 60fps' : '1080p'; badge = isTikTok ? 'No Watermark' : 'Full HD'; }
+          else if (h >= 720) { label = fps >= 50 ? '720p 60fps' : '720p'; badge = isTikTok ? 'No Watermark' : 'HD'; }
           else if (h >= 480) { label = '480p'; badge = 'SD'; }
           else { label = '360p'; badge = 'Data Saver'; }
 
@@ -205,14 +230,23 @@ app.get('/api/info', async (req, res) => {
         }
       }
 
-      // If no standard heights found, fallback to unique heights
+      // If no standard heights found, fallback to highest available format or original
       if (videoOptions.length === 0) {
-        const uniqueHeights = [...new Set(videoFormats.map(f => f.height))].filter(Boolean).sort((a, b) => b - a);
-        for (const h of uniqueHeights) {
+        if (videoFormats.length > 0) {
+          const bestF = videoFormats[0];
+          const h = bestF.height || 1080;
           videoOptions.push({
             height: h,
-            label: `${h}p`,
-            badge: h >= 720 ? 'HD' : 'SD',
+            label: isTikTok ? 'Original HD (No Watermark)' : (h >= 1080 ? 'Full HD (Original)' : `${h}p (Original)`),
+            badge: isTikTok ? 'ไร้ลายน้ำ' : 'Original',
+            fps: bestF.fps || 30,
+            estSize: (bestF.filesize || bestF.filesize_approx) ? formatBytes(bestF.filesize || bestF.filesize_approx) : ''
+          });
+        } else {
+          videoOptions.push({
+            height: 1080,
+            label: isTikTok ? 'HD (No Watermark)' : 'Best Quality (MP4)',
+            badge: isTikTok ? 'ไร้ลายน้ำ' : 'Best',
             fps: 30,
             estSize: ''
           });
@@ -234,14 +268,25 @@ app.get('/api/info', async (req, res) => {
         bestThumb = sortedThumbs[0].url || data.thumbnail;
       }
 
+      // Determine clean creator name based on platform
+      let creatorName = data.uploader || data.channel || data.creator || '';
+      if (!creatorName) {
+        if (platform === 'tiktok') creatorName = 'TikTok Creator';
+        else if (platform === 'instagram') creatorName = 'Instagram Creator';
+        else if (platform === 'facebook') creatorName = 'Facebook Video';
+        else if (platform === 'twitter') creatorName = 'X Creator';
+        else creatorName = 'Video Creator';
+      }
+
       const responsePayload = {
         id: data.id,
+        platform,
         title: data.title,
         description: data.description ? data.description.substring(0, 150) + '...' : '',
         thumbnail: bestThumb,
-        channel: data.uploader || data.channel || 'YouTube Creator',
-        channelUrl: data.channel_url || (data.uploader_id ? `https://www.youtube.com/${data.uploader_id}` : ''),
-        duration: data.duration,
+        channel: creatorName,
+        channelUrl: data.channel_url || data.uploader_url || '',
+        duration: data.duration || 0,
         durationFormatted: formatDuration(data.duration),
         views: formatViews(data.view_count),
         uploadDate: data.upload_date ? `${data.upload_date.slice(0, 4)}-${data.upload_date.slice(4, 6)}-${data.upload_date.slice(6, 8)}` : '',
@@ -261,13 +306,21 @@ app.get('/api/info', async (req, res) => {
 
 // 2. POST /api/download/start - Start download process
 app.post('/api/download/start', (req, res) => {
-  const { url, type, quality, format, title, lang = 'th' } = req.body;
+  const { url, type, quality, format, title, startTime, endTime, lang = 'th' } = req.body;
 
   if (!url) {
     return res.status(400).json({
-      error: lang === 'en' ? 'YouTube URL is required.' : 'กรุณากรอก YouTube URL'
+      error: lang === 'en' ? 'Video URL is required.' : 'กรุณากรอก URL วิดีโอ'
     });
   }
+
+  const cleanUrl = url.trim();
+  const platform = detectPlatform(cleanUrl);
+  const isYoutube = platform === 'youtube';
+
+  const cleanStart = sanitizeTime(startTime);
+  const cleanEnd = sanitizeTime(endTime);
+  const hasTrim = Boolean(cleanStart && cleanEnd && cleanStart !== cleanEnd);
 
   const jobId = crypto.randomUUID();
   const safeTitle = sanitizeFilename(title || 'CatchFromU');
@@ -275,20 +328,27 @@ app.post('/api/download/start', (req, res) => {
   const outputFileName = `${jobId}.${targetExt}`;
   const finalFilePath = path.join(DOWNLOADS_DIR, outputFileName);
 
+  const initialStage = hasTrim
+    ? (lang === 'en' ? `Trimming section (${cleanStart} - ${cleanEnd})...` : `กำลังตัดเฉพาะช่วง (${cleanStart} - ${cleanEnd})...`)
+    : (lang === 'en' ? 'Preparing download...' : 'กำลังเตรียมการดาวน์โหลด...');
+
   const job = {
     id: jobId,
-    url,
+    url: cleanUrl,
     type,
     quality,
     format: targetExt,
     title: safeTitle,
+    hasTrim,
+    startTime: cleanStart,
+    endTime: cleanEnd,
     outputFileName,
     finalFilePath,
     status: 'starting', // starting, downloading, processing, completed, error
     percent: 0,
     speed: '',
     eta: '',
-    stage: lang === 'en' ? 'Preparing download...' : 'กำลังเตรียมการดาวน์โหลด...',
+    stage: initialStage,
     error: null,
     streamIndex: 0,
     createdAt: Date.now()
@@ -302,9 +362,16 @@ app.post('/api/download/start', (req, res) => {
     '--no-playlist'
   ];
 
+  // If trim requested
+  if (hasTrim) {
+    ytArgs.push('--download-sections', `*${cleanStart}-${cleanEnd}`);
+    ytArgs.push('--force-keyframes-at-cuts');
+  }
+
   if (type === 'audio') {
-    // For audio, android client reliably streams long audio without 403
-    ytArgs.push('--extractor-args', 'youtube:player_client=android,web');
+    if (isYoutube) {
+      ytArgs.push('--extractor-args', 'youtube:player_client=android,web');
+    }
     ytArgs.push('-f', 'ba/b');
     if (format === 'm4a') {
       ytArgs.push('-x');
@@ -328,12 +395,14 @@ app.post('/api/download/start', (req, res) => {
       formatFilter = `bestvideo[height<=${height}]+bestaudio/best[height<=${height}]/best`;
     }
     ytArgs.push('-f', formatFilter);
-    ytArgs.push('--http-chunk-size', '10M');
+    if (!hasTrim) {
+      ytArgs.push('--http-chunk-size', '10M');
+    }
     ytArgs.push('--merge-output-format', 'mp4');
     ytArgs.push('-o', path.join(DOWNLOADS_DIR, `${jobId}.%(ext)s`));
   }
 
-  ytArgs.push(url.trim());
+  ytArgs.push(cleanUrl);
 
   console.log(`[Job ${jobId}] Starting: yt-dlp ${ytArgs.join(' ')}`);
 
@@ -375,11 +444,13 @@ app.post('/api/download/start', (req, res) => {
         computedPct = job.percent;
       }
 
-      const stageDesc = type === 'video'
-        ? (job.streamIndex > 1
-            ? (lang === 'en' ? 'Downloading audio stream...' : 'กำลังดาวน์โหลดสตรีมเสียง...')
-            : (lang === 'en' ? 'Downloading video stream...' : 'กำลังดาวน์โหลดสตรีมวิดีโอ...'))
-        : (lang === 'en' ? 'Downloading audio stream...' : 'กำลังดาวน์โหลดสตรีมเสียง...');
+      const stageDesc = job.hasTrim
+        ? (lang === 'en' ? `Trimming & downloading (${job.startTime} - ${job.endTime})...` : `กำลังตัดช่วงและดาวน์โหลด (${job.startTime} - ${job.endTime})...`)
+        : (type === 'video'
+            ? (job.streamIndex > 1
+                ? (lang === 'en' ? 'Downloading audio stream...' : 'กำลังดาวน์โหลดสตรีมเสียง...')
+                : (lang === 'en' ? 'Downloading video stream...' : 'กำลังดาวน์โหลดสตรีมวิดีโอ...'))
+            : (lang === 'en' ? 'Downloading audio stream...' : 'กำลังดาวน์โหลดสตรีมเสียง...'));
 
       broadcastJob(jobId, {
         status: 'downloading',
@@ -599,6 +670,40 @@ app.get('/api/download/file/:jobId', (req, res) => {
       }
     }, 5 * 60 * 1000);
   });
+});
+
+// 5. GET /api/download/thumbnail - Download HD cover image directly
+app.get('/api/download/thumbnail', async (req, res) => {
+  const { url, title } = req.query;
+  if (!url || typeof url !== 'string') {
+    return res.status(400).send('Thumbnail URL is required');
+  }
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+
+    if (!response.ok) {
+      return res.status(response.status).send('Failed to fetch thumbnail image');
+    }
+
+    const contentType = response.headers.get('content-type') || 'image/jpeg';
+    const ext = contentType.includes('png') ? 'png' : (contentType.includes('webp') ? 'webp' : 'jpg');
+    const safeTitle = sanitizeFilename(title || 'CatchFromU_Thumbnail');
+    const filename = `${safeTitle}_Cover.${ext}`;
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"; filename*=UTF-8''${encodeURIComponent(filename)}`);
+
+    const arrayBuffer = await response.arrayBuffer();
+    res.send(Buffer.from(arrayBuffer));
+  } catch (err) {
+    console.error('Error in /api/download/thumbnail:', err);
+    res.status(500).send('Error downloading thumbnail');
+  }
 });
 
 // Periodic cleaner for stale files in downloads directory (older than 25 minutes)

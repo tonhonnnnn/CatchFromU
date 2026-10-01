@@ -42,6 +42,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const hudEta = document.getElementById('hudEta');
   const btnCancelDownload = document.getElementById('btnCancelDownload');
 
+  // New Features Elements
+  const txtTiktokTag = document.getElementById('txtTiktokTag');
+  const btnDownloadThumb = document.getElementById('btnDownloadThumb');
+  const txtDownloadThumb = document.getElementById('txtDownloadThumb');
+  const platformBadge = document.getElementById('platformBadge');
+  const trimToggle = document.getElementById('trimToggle');
+  const txtTrimToggle = document.getElementById('txtTrimToggle');
+  const txtTrimHint = document.getElementById('txtTrimHint');
+  const trimInputsRow = document.getElementById('trimInputsRow');
+  const txtTrimStartLabel = document.getElementById('txtTrimStartLabel');
+  const trimStartInput = document.getElementById('trimStartInput');
+  const btnSetStartCurrent = document.getElementById('btnSetStartCurrent');
+  const txtTrimEndLabel = document.getElementById('txtTrimEndLabel');
+  const trimEndInput = document.getElementById('trimEndInput');
+  const btnSetEndMax = document.getElementById('btnSetEndMax');
+
   // i18n Elements
   const txtEngineStatus = document.getElementById('txtEngineStatus');
   const txtHeroTitle = document.getElementById('txtHeroTitle');
@@ -72,17 +88,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Translations Dictionary
   const translations = {
     th: {
-      pageTitle: "CatchFromU — ดาวน์โหลดวิดีโอ YouTube ระดับ 4K และเสียง MP3",
+      pageTitle: "CatchFromU — ดาวน์โหลดวิดีโอ YouTube, TikTok, Reels และเสียง MP3",
       engineStatus: "Engine Active",
       heroBadge: "Apple-Engineered Experience",
       heroTitle: "จับทุกช่วงเวลาที่คุณชื่นชอบ",
-      heroSubtitle: "ดาวน์โหลดวิดีโอ YouTube คมชัดสูงสุดระดับ 4K Ultra HD และแยกไฟล์เสียง MP3 / AAC คุณภาพสตูดิโอ รวดเร็ว ปลอดภัย ไร้โฆษณา",
-      searchPlaceholder: "วางลิงก์ YouTube ที่นี่... (เช่น https://youtu.be/...)",
+      heroSubtitle: "ดาวน์โหลดวิดีโอจาก YouTube, TikTok (ไร้ลายน้ำ), IG Reels, Facebook และ X คมชัดสูงสุดถึง 4K พร้อมแยกไฟล์เสียง MP3 รวดเร็ว ปลอดภัย ไร้โฆษณา",
+      searchPlaceholder: "วางลิงก์ YouTube, TikTok, Instagram, Facebook หรือ X...",
       pasteBtn: "วาง",
       catchBtn: "ค้นหาคลิป",
-      samplesPrompt: "ลองทดสอบคลิปตัวอย่าง:",
+      tiktokTag: "ไร้ลายน้ำ",
+      downloadThumbBtn: "ดาวน์โหลดรูปปก HD",
+      trimToggle: "ตัดเฉพาะช่วงเวลา (Trim & Cut)",
+      trimHint: "ดาวน์โหลดเฉพาะท่อนที่ต้องการ",
+      trimStartLabel: "เริ่ม (Start):",
+      trimEndLabel: "สิ้นสุด (End):",
+      btnSetEndMax: "จบคลิป",
       loadingTitle: "กำลังตรวจสอบและดึงความละเอียดสูงสุด...",
-      loadingSubtitle: "เชื่อมต่อกับ YouTube Content Delivery Network",
+      loadingSubtitle: "เชื่อมต่อกับระบบเครือข่ายความเร็วสูง",
       segmentVideo: "วิดีโอพร้อมเสียง (MP4)",
       segmentAudio: "ไฟล์เสียงอย่างเดียว (MP3 / AAC)",
       downloadVideoPrefix: "ดาวน์โหลดวิดีโอ",
@@ -105,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
       bento2Title: "Studio Master Audio",
       bento2Desc: "แปลงเป็นไฟล์เสียง MP3 บิตเรตสูงถึง 320 kbps หรือต้นฉบับ Apple AAC (.m4a) สำหรับฟังบน iPhone, iPad และ Mac",
       bento3Title: "เทคโนโลยีสปีดเทอร์โบ",
-      bento3Desc: "ขับเคลื่อนด้วย yt-dlp พร้อมโปรโตคอลสตรีมมิ่งความเร็วสูงและการติดตามความคืบหน้าแบบ Real-time ผ่าน Server-Sent Events",
+      bento3Desc: "ขับเคลื่อนด้วย yt-dlp รองรับ YouTube, TikTok ไร้ลายน้ำ, IG Reels, FB, X พร้อมติดตามความคืบหน้าแบบ Real-time",
       bento4Title: "ความเป็นส่วนตัว 100%",
       bento4Desc: "ไม่เก็บข้อมูล ไม่ต้องการการลงทะเบียน และระบบทำความสะอาดไฟล์ชั่วคราวจะลบไฟล์ทิ้งอัตโนมัติอย่างปลอดภัย",
       footerNav1: "ดาวน์โหลด",
@@ -113,23 +135,29 @@ document.addEventListener('DOMContentLoaded', () => {
       footerNav3: "ช่วยเหลือ",
       footerCopy: "© 2026 CatchFromU. สไตล์การออกแบบที่ได้แรงบันดาลใจจากปรัชญา Apple Design.",
       footerDisclaimer: "เครื่องมือนี้สร้างขึ้นเพื่อการศึกษาและการใช้งานส่วนบุคคลตามข้อกำหนดสิทธิของเนื้อหา",
-      alertEmptyUrl: "กรุณากรอกหรือวางลิงก์ YouTube ที่ต้องการ",
+      alertEmptyUrl: "กรุณากรอกหรือวางลิงก์วิดีโอที่ต้องการ",
       pasteHint: "กรุณากดปุ่ม ⌘ + V (หรือ Ctrl + V) เพื่อวางลิงก์",
       cancelBtnTitle: "ยกเลิกการดาวน์โหลด",
       cancelToast: "ยกเลิกการดาวน์โหลดเรียบร้อยแล้ว"
     },
     en: {
-      pageTitle: "CatchFromU — YouTube 4K & MP3 Studio Downloader",
+      pageTitle: "CatchFromU — 4K Video & MP3 Downloader (YouTube, TikTok, Reels, X)",
       engineStatus: "Engine Active",
       heroBadge: "Apple-Engineered Experience",
       heroTitle: "Capture Every Moment You Love.",
-      heroSubtitle: "Download YouTube videos in crisp 4K Ultra HD and extract studio-fidelity MP3 / AAC audio. Fast, private, and ad-free.",
-      searchPlaceholder: "Paste YouTube link here... (e.g. https://youtu.be/...)",
+      heroSubtitle: "Download videos from YouTube, TikTok (No Watermark), IG Reels, Facebook, and X up to 4K Ultra HD, plus studio MP3 audio. Fast, clean, ad-free.",
+      searchPlaceholder: "Paste YouTube, TikTok, Instagram, Facebook or X link...",
       pasteBtn: "Paste",
       catchBtn: "Catch Video",
-      samplesPrompt: "Try popular samples:",
+      tiktokTag: "No Watermark",
+      downloadThumbBtn: "Download HD Cover",
+      trimToggle: "Trim & Cut Section",
+      trimHint: "Download only the selected section",
+      trimStartLabel: "Start:",
+      trimEndLabel: "End:",
+      btnSetEndMax: "End",
       loadingTitle: "Inspecting & retrieving highest resolutions...",
-      loadingSubtitle: "Connecting to YouTube Content Delivery Network",
+      loadingSubtitle: "Connecting to High-Speed Delivery Network",
       segmentVideo: "Video with Audio (MP4)",
       segmentAudio: "Audio Only (MP3 / AAC)",
       downloadVideoPrefix: "Download Video",
@@ -151,8 +179,8 @@ document.addEventListener('DOMContentLoaded', () => {
       bento1Desc: "Seamlessly pairs peak-resolution video streams with crystal-clear audio via automated FFmpeg processing for true-to-life playback.",
       bento2Title: "Studio Master Audio",
       bento2Desc: "Extract crisp MP3 audio up to 320 kbps, or preserve native Apple Lossless AAC (.m4a) for iPhone, iPad, Apple Watch, and Mac.",
-      bento3Title: "Turbo Speed Engine",
-      bento3Desc: "Powered by modern yt-dlp protocols with live progress streaming via Server-Sent Events.",
+      bento3Title: "Turbo Speed Multi-Platform",
+      bento3Desc: "Powered by modern yt-dlp protocols supporting YouTube, TikTok (no watermark), IG Reels, FB & X with live SSE progress tracking.",
       bento4Title: "100% Private & Clean",
       bento4Desc: "Zero tracking, no registration, and automated cleanup removes temporary files after transmission.",
       footerNav1: "Download",
@@ -160,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
       footerNav3: "Support",
       footerCopy: "© 2026 CatchFromU. Design philosophy inspired by Apple.",
       footerDisclaimer: "This tool is built for personal and educational use in compliance with content rights.",
-      alertEmptyUrl: "Please paste or enter a valid YouTube video link",
+      alertEmptyUrl: "Please paste or enter a valid video link",
       pasteHint: "Press ⌘ + V (or Ctrl + V) to paste link into the search box",
       cancelBtnTitle: "Cancel download",
       cancelToast: "Download cancelled."
@@ -226,6 +254,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     txtSegmentVideo.textContent = t.segmentVideo;
     txtSegmentAudio.textContent = t.segmentAudio;
+
+    if (txtTiktokTag) txtTiktokTag.textContent = t.tiktokTag;
+    if (txtDownloadThumb) txtDownloadThumb.textContent = t.downloadThumbBtn;
+    if (txtTrimToggle) txtTrimToggle.textContent = t.trimToggle;
+    if (txtTrimHint) txtTrimHint.textContent = t.trimHint;
+    if (txtTrimStartLabel) txtTrimStartLabel.textContent = t.trimStartLabel;
+    if (txtTrimEndLabel) txtTrimEndLabel.textContent = t.trimEndLabel;
+    if (btnSetEndMax) btnSetEndMax.textContent = t.btnSetEndMax;
 
     txtHistoryTitle.textContent = t.historyTitle;
     clearHistoryBtn.textContent = t.clearHistory;
@@ -328,8 +364,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const val = urlInput.value.trim();
     clearBtn.style.display = val ? 'flex' : 'none';
 
-    // Auto-detect YouTube URL pasted
-    if (/(youtube\.com\/(watch\?|shorts\/|live\/)|youtu\.be\/)/i.test(val)) {
+    // Auto-detect supported platforms (YouTube, TikTok, IG Reels, FB, X)
+    if (/(youtube\.com\/(watch\?|shorts\/|live\/)|youtu\.be\/|tiktok\.com\/|instagram\.com\/(reel|p)\/|facebook\.com\/|fb\.watch\/|twitter\.com\/|x\.com\/)/i.test(val)) {
       fetchVideoDetails();
     }
   });
@@ -469,6 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 6. Render Video Studio Card
   function renderVideoCard(data) {
+    const t = translations[currentLang];
     videoThumb.src = data.thumbnail;
     videoThumb.alt = data.title;
     durationBadge.textContent = data.durationFormatted || '0:00';
@@ -476,7 +513,26 @@ document.addEventListener('DOMContentLoaded', () => {
     channelName.textContent = data.channel;
     channelLink.href = data.channelUrl || '#';
     viewCountBadge.textContent = currentLang === 'en' ? `${data.views} views` : `${data.views} วิว`;
-    dateBadge.textContent = data.uploadDate || 'YouTube';
+    dateBadge.textContent = data.uploadDate || 'Online';
+
+    if (platformBadge) {
+      const p = (data.platform || 'youtube').toUpperCase();
+      platformBadge.textContent = p === 'YOUTUBE' ? 'YouTube' : (p === 'TIKTOK' ? 'TikTok' : (p === 'INSTAGRAM' ? 'Instagram' : p));
+    }
+
+    // Reset and initialize trim controls
+    if (trimToggle) {
+      trimToggle.checked = false;
+    }
+    if (trimInputsRow) {
+      trimInputsRow.style.display = 'none';
+    }
+    if (trimStartInput) {
+      trimStartInput.value = '00:00';
+    }
+    if (trimEndInput) {
+      trimEndInput.value = data.durationFormatted || '00:00';
+    }
 
     // Set default mode and render format choices
     currentMode = 'video';
@@ -617,11 +673,68 @@ document.addEventListener('DOMContentLoaded', () => {
     btnStartDownload.style.background = 'var(--accent)';
     formatGrid.style.pointerEvents = 'auto';
     formatGrid.style.opacity = '1';
-    if (currentMode === 'video') {
-      downloadLabel.textContent = `${t.downloadVideoPrefix} ${selectedQuality.label} (MP4)`;
-    } else {
-      downloadLabel.textContent = `${t.downloadAudioPrefix} ${selectedQuality.label}`;
+
+    let trimSuffix = '';
+    if (trimToggle && trimToggle.checked && trimStartInput && trimEndInput) {
+      const s = trimStartInput.value.trim() || '00:00';
+      const e = trimEndInput.value.trim();
+      if (e) {
+        trimSuffix = ` [${s} - ${e}]`;
+      }
     }
+
+    if (currentMode === 'video') {
+      downloadLabel.textContent = `${t.downloadVideoPrefix} ${selectedQuality.label}${trimSuffix} (MP4)`;
+    } else {
+      downloadLabel.textContent = `${t.downloadAudioPrefix} ${selectedQuality.label}${trimSuffix}`;
+    }
+  }
+
+  // Thumbnail Downloader Listener
+  if (btnDownloadThumb) {
+    btnDownloadThumb.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!currentVideoData || !currentVideoData.thumbnail) return;
+      const dlUrl = `/api/download/thumbnail?url=${encodeURIComponent(currentVideoData.thumbnail)}&title=${encodeURIComponent(currentVideoData.title || 'Cover')}`;
+      window.location.href = dlUrl;
+    });
+  }
+
+  // Trim Controls Listeners
+  if (trimToggle) {
+    trimToggle.addEventListener('change', () => {
+      if (trimInputsRow) {
+        trimInputsRow.style.display = trimToggle.checked ? 'flex' : 'none';
+      }
+      resetDownloadButton();
+    });
+  }
+
+  if (btnSetStartCurrent) {
+    btnSetStartCurrent.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (trimStartInput) {
+        trimStartInput.value = '00:00';
+        resetDownloadButton();
+      }
+    });
+  }
+
+  if (btnSetEndMax) {
+    btnSetEndMax.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (trimEndInput && currentVideoData && currentVideoData.durationFormatted) {
+        trimEndInput.value = currentVideoData.durationFormatted;
+        resetDownloadButton();
+      }
+    });
+  }
+
+  if (trimStartInput) {
+    trimStartInput.addEventListener('input', resetDownloadButton);
+  }
+  if (trimEndInput) {
+    trimEndInput.addEventListener('input', resetDownloadButton);
   }
 
   // 8. Start Download Engine
@@ -656,6 +769,18 @@ document.addEventListener('DOMContentLoaded', () => {
         title: currentVideoData.title,
         lang: currentLang
       };
+
+      if (trimToggle && trimToggle.checked) {
+        const startVal = trimStartInput ? trimStartInput.value.trim() : '';
+        const endVal = trimEndInput ? trimEndInput.value.trim() : '';
+        if (startVal && endVal && startVal !== endVal) {
+          payload.startTime = startVal;
+          payload.endTime = endVal;
+          hudStage.textContent = currentLang === 'en'
+            ? `Trimming section (${startVal} - ${endVal})...`
+            : `กำลังตัดเฉพาะช่วง (${startVal} - ${endVal})...`;
+        }
+      }
 
       const startRes = await fetch('/api/download/start', {
         method: 'POST',
