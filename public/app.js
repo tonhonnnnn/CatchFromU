@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const txtHeroSubtitle = document.getElementById('txtHeroSubtitle');
   const txtPasteBtn = document.getElementById('txtPasteBtn');
   const txtCatchBtn = document.getElementById('txtCatchBtn');
-  const txtSamplesPrompt = document.getElementById('txtSamplesPrompt');
   const txtLoadingTitle = document.getElementById('txtLoadingTitle');
   const txtLoadingSubtitle = document.getElementById('txtLoadingSubtitle');
   const txtSegmentVideo = document.getElementById('txtSegmentVideo');
@@ -221,7 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
     pasteBtn.title = lang === 'en' ? 'Paste from clipboard' : 'วางจากคลิปบอร์ด';
     txtCatchBtn.textContent = t.catchBtn;
     clearBtn.title = lang === 'en' ? 'Clear' : 'ล้าง';
-    txtSamplesPrompt.textContent = t.samplesPrompt;
 
     txtLoadingTitle.textContent = t.loadingTitle;
     txtLoadingSubtitle.textContent = t.loadingSubtitle;
@@ -385,16 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
   catchBtn.addEventListener('click', (e) => {
     e.preventDefault();
     fetchVideoDetails();
-  });
-
-  // Quick Samples
-  document.querySelectorAll('.sample-chip').forEach(chip => {
-    chip.addEventListener('click', (e) => {
-      e.preventDefault();
-      urlInput.value = chip.dataset.url;
-      clearBtn.style.display = 'flex';
-      fetchVideoDetails();
-    });
   });
 
   // 4. Alerts
