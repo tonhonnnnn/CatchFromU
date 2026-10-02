@@ -935,7 +935,7 @@ body {
   border: none;
   background: transparent;
   font-family: monospace, var(--font-system);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-main);
   outline: none;
@@ -963,16 +963,6 @@ body {
   color: var(--text-subtle);
   display: flex;
   align-items: center;
-}
-
-@media (max-width: 540px) {
-  .trim-inputs-row {
-    flex-direction: column;
-    gap: 10px;
-  }
-  .trim-separator {
-    transform: rotate(90deg);
-  }
 }
 
 /* Dynamic Download Island / Progress Section */
@@ -1315,4 +1305,422 @@ body {
 
 .footer-nav a:hover {
   color: var(--text-main);
+}
+
+/* ============================================================
+   Apple Mobile First Responsive Engine (Optimized for iOS & Android)
+   ============================================================ */
+
+/* iOS Safe Area Inset Support */
+body {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.apple-nav {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+@media (max-width: 640px) {
+  /* Page Padding */
+  .main-wrapper {
+    padding: 20px 16px 60px;
+  }
+
+  /* Navigation Bar */
+  .nav-container {
+    padding: 0 16px;
+    height: 52px;
+  }
+
+  .brand-link {
+    font-size: 17px;
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .status-pill {
+    display: none; /* Hide to prevent cramped navbar on narrow screens */
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .lang-btn {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  .theme-toggle-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  /* Hero Section */
+  .hero-section {
+    margin-bottom: 20px;
+  }
+
+  .hero-badge {
+    margin-bottom: 12px;
+    padding: 3px 10px;
+    font-size: 11px;
+  }
+
+  .hero-title {
+    font-size: clamp(26px, 7.5vw, 36px);
+    letter-spacing: -0.025em;
+    margin-bottom: 10px;
+  }
+
+  .hero-subtitle {
+    font-size: 14px;
+    line-height: 1.45;
+    padding: 0 6px;
+  }
+
+  /* Platform Pills - Mobile Carousel / Compact wrap */
+  .platforms-pill-bar {
+    gap: 6px;
+    margin-top: 14px;
+    padding: 2px 4px;
+  }
+
+  .platform-pill {
+    font-size: 11.5px;
+    padding: 4px 10px;
+    gap: 5px;
+  }
+
+  .platform-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  /* Search Capsule Mobile Layout (Ergonomic 2-row design) */
+  .search-capsule-wrapper {
+    margin-top: 18px;
+    margin-bottom: 24px;
+  }
+
+  .search-capsule {
+    flex-wrap: wrap;
+    padding: 10px 12px 10px 14px;
+    border-radius: var(--radius-lg);
+    gap: 8px;
+  }
+
+  .search-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+  }
+
+  .search-input {
+    font-size: 16px; /* 16px prevents iOS Safari auto-zooming! */
+    padding: 4px 0;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .search-controls {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  .btn-clear {
+    width: 28px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+
+  .btn-secondary-pill {
+    flex: 0 0 auto;
+    padding: 10px 14px;
+    font-size: 13px;
+    min-height: 42px;
+  }
+
+  .btn-catch-primary {
+    flex: 1 1 auto;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    justify-content: center;
+    min-height: 42px;
+  }
+
+  /* Video Studio Card */
+  .video-card {
+    padding: 16px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 28px;
+  }
+
+  .video-overview {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .btn-thumb-action {
+    padding: 10px 14px;
+    font-size: 12.5px;
+    min-height: 42px;
+  }
+
+  .video-title {
+    font-size: 16px;
+    line-height: 1.35;
+    margin-bottom: 8px;
+  }
+
+  .channel-info {
+    margin-bottom: 10px;
+  }
+
+  .channel-name {
+    font-size: 13px;
+  }
+
+  .meta-row {
+    gap: 6px;
+  }
+
+  .meta-chip {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* Segmented Video / Audio Switcher */
+  .segmented-control-wrapper {
+    padding: 3px;
+    margin-bottom: 16px;
+  }
+
+  .segment-btn {
+    padding: 8px 6px;
+    font-size: 12.5px;
+    gap: 5px;
+  }
+
+  .segment-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Format Grid (Compact 2-Column Grid on Mobile) */
+  .format-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .format-card {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    gap: 4px;
+  }
+
+  .format-label {
+    font-size: 14px;
+  }
+
+  .format-badge {
+    font-size: 9.5px;
+    padding: 1px 5px;
+  }
+
+  .format-details {
+    font-size: 11px;
+  }
+
+  /* Trim & Cut Studio */
+  .trim-container {
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 18px;
+  }
+
+  .trim-header {
+    gap: 8px;
+  }
+
+  .trim-toggle-text {
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .trim-badge-hint {
+    font-size: 11px;
+  }
+
+  .trim-inputs-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+
+  .trim-field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .trim-field-label {
+    display: none; /* Hide to give inputs maximum room on small screens */
+  }
+
+  .trim-input-capsule {
+    width: 100%;
+    justify-content: space-between;
+    padding: 4px 6px;
+  }
+
+  .trim-input-capsule input {
+    width: 55px;
+    font-size: 16px; /* 16px prevents iOS zoom! */
+  }
+
+  .btn-time-quick {
+    font-size: 11px;
+    padding: 4px 6px;
+    min-height: 28px;
+  }
+
+  .trim-separator {
+    flex-shrink: 0;
+  }
+
+  /* Download Action Button & Progress HUD */
+  .download-hud {
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+  }
+
+  .hud-stage {
+    font-size: 13px;
+  }
+
+  .hud-percent {
+    font-size: 14px;
+  }
+
+  .btn-cancel-download {
+    width: 32px;
+    height: 32px;
+  }
+
+  .hud-footer {
+    font-size: 11px;
+  }
+
+  .btn-download-action {
+    padding: 13px 18px;
+    font-size: 15px;
+    border-radius: var(--radius-md);
+    min-height: 48px;
+  }
+
+  .btn-download-action svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* History Section */
+  .history-card {
+    padding: 16px;
+    border-radius: var(--radius-md);
+  }
+
+  .history-header {
+    margin-bottom: 12px;
+  }
+
+  .history-title {
+    font-size: 15px;
+  }
+
+  .history-item {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .history-item-thumb {
+    width: 44px;
+    height: 28px;
+  }
+
+  .history-item-title {
+    font-size: 12px;
+    max-width: 150px;
+  }
+
+  .history-item-meta {
+    font-size: 10px;
+  }
+
+  .btn-history-dl {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* Bento Features */
+  .bento-section {
+    margin-top: 36px;
+  }
+
+  .section-title {
+    font-size: 22px;
+  }
+
+  .section-subtitle {
+    font-size: 13.5px;
+  }
+
+  .bento-card {
+    padding: 18px;
+    border-radius: var(--radius-md);
+  }
+
+  .bento-icon-wrapper {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 12px;
+  }
+
+  .bento-icon-wrapper svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .bento-title {
+    font-size: 16px;
+  }
+
+  .bento-desc {
+    font-size: 13px;
+  }
+
+  /* Footer */
+  .apple-footer {
+    margin-top: 40px;
+    padding: 24px 16px calc(24px + env(safe-area-inset-bottom, 0px));
+    font-size: 11px;
+  }
 }
