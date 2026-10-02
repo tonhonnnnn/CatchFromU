@@ -96,6 +96,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   font-family: var(--font-system);
   background-color: var(--bg-page);
@@ -104,7 +113,25 @@ body {
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
   transition: background-color 0.4s ease, color 0.3s ease;
+}
+
+/* Apple Ambient Glows Container */
+.ambient-glows-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  max-width: 100vw;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* Apple Ambient Glows */
@@ -1321,9 +1348,19 @@ body {
 }
 
 @media (max-width: 640px) {
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    touch-action: pan-y !important;
+    overscroll-behavior-x: none !important;
+  }
+
   /* Page Padding */
   .main-wrapper {
     padding: 20px 16px 60px;
+    max-width: 100vw;
+    overflow-x: hidden;
   }
 
   /* Navigation Bar */
