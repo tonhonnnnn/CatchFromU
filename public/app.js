@@ -320,15 +320,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
   initLanguage();
 
-  // 2. Theme Management (System aware & localStorage)
+  // 2. Theme Management (Real-time System Device Sync & Manual Override)
+  const colorSchemeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
   function initTheme() {
     const savedTheme = localStorage.getItem('catchfromu_theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const activeTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-    applyTheme(activeTheme);
+    if (savedTheme) {
+      applyTheme(savedTheme, false);
+    } else {
+      // Follow user's device system mode by default
+      applyTheme(colorSchemeQuery.matches ? 'dark' : 'light', false);
+    }
+
+    // Real-time listener for system theme changes (e.g. sunset/sunrise or OS toggle)
+    try {
+      colorSchemeQuery.addEventListener('change', (e) => {
+        const manualSaved = localStorage.getItem('catchfromu_theme');
+        // Only auto-switch if user hasn't manually overridden it
+        if (!manualSaved) {
+          applyTheme(e.matches ? 'dark' : 'light', false);
+        }
+      });
+    } catch (err) {
+      if (colorSchemeQuery.addListener) {
+        colorSchemeQuery.addListener((e) => {
+          if (!localStorage.getItem('catchfromu_theme')) {
+            applyTheme(e.matches ? 'dark' : 'light', false);
+          }
+        });
+      }
+    }
   }
 
-  function applyTheme(theme) {
+  function applyTheme(theme, isManualClick = false) {
     if (theme === 'dark') {
       document.documentElement.setAttribute('data-theme', 'dark');
       themeIcon.innerHTML = `
@@ -343,18 +367,36 @@ document.addEventListener('DOMContentLoaded', () => {
         <path d="m19.07 4.93-1.41 1.41"></path>
       `;
     } else {
-      document.documentElement.removeAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', 'light');
       themeIcon.innerHTML = `
         <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
       `;
     }
-    localStorage.setItem('catchfromu_theme', theme);
+
+    // Sync mobile browser status bar / theme-color
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', theme === 'dark' ? '#000000' : '#ECECEE');
+    }
+
+    // Only persist if user explicitly clicked the toggle button
+    if (isManualClick) {
+      const sysTheme = colorSchemeQuery.matches ? 'dark' : 'light';
+      if (theme === sysTheme) {
+        // If user manually switched back to match the system, remove override to resume auto-sync
+        localStorage.removeItem('catchfromu_theme');
+      } else {
+        localStorage.setItem('catchfromu_theme', theme);
+      }
+    }
   }
 
   themeToggleBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    applyTheme(isDark ? 'light' : 'dark');
+    const currentIsDark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+      (!document.documentElement.getAttribute('data-theme') && colorSchemeQuery.matches);
+    const newTheme = currentIsDark ? 'light' : 'dark';
+    applyTheme(newTheme, true);
   });
 
   initTheme();

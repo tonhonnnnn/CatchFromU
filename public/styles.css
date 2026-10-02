@@ -59,6 +59,34 @@
   --badge-text: #F5F5F7;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg-page: #000000;
+    --bg-nav: rgba(0, 0, 0, 0.8);
+    --bg-card: rgba(28, 28, 30, 0.78);
+    --bg-card-solid: #1C1C1E;
+    --bg-card-hover: rgba(44, 44, 46, 0.85);
+    --border-subtle: rgba(255, 255, 255, 0.12);
+    --border-focus: rgba(41, 151, 255, 0.5);
+    --text-main: #F5F5F7;
+    --text-muted: #A1A1A6;
+    --text-subtle: #6E6E73;
+    --accent: #2997FF;
+    --accent-hover: #45A5FF;
+    --accent-active: #147CE5;
+    --accent-light: rgba(41, 151, 255, 0.16);
+    --accent-gradient: linear-gradient(135deg, #2997FF 0%, #6366F1 50%, #A855F7 100%);
+    --pill-track: rgba(255, 255, 255, 0.1);
+    --pill-active: rgba(255, 255, 255, 0.22);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 1px rgba(255, 255, 255, 0.15);
+    --shadow-lg: 0 24px 50px rgba(0, 0, 0, 0.75), 0 0 1px rgba(255, 255, 255, 0.2);
+    --glow: rgba(41, 151, 255, 0.25);
+    --badge-bg: rgba(255, 255, 255, 0.1);
+    --badge-text: #F5F5F7;
+  }
+}
+
 /* Reset & Basics */
 *, *::before, *::after {
   box-sizing: border-box;
