@@ -43,7 +43,7 @@
 npm install
 ```
 
-*(เครื่องต้องติดตั้ง `yt-dlp` และ `ffmpeg` เช่น ติดตั้งผ่าน Homebrew: `brew install yt-dlp ffmpeg`)*
+*(เครื่องต้องติดตั้ง Node.js 22 ขึ้นไป, `yt-dlp` รุ่นล่าสุด และ `ffmpeg` เช่น ติดตั้งผ่าน Homebrew: `brew install node yt-dlp ffmpeg`)*
 
 ### 2. รันเซิร์ฟเวอร์
 ```bash
@@ -76,6 +76,18 @@ npm run dev
 3. Railway จะตรวจจับ `Dockerfile` และเปิดใช้งานทันที
 
 ---
+
+## แก้ปัญหา YouTube ขอให้ยืนยันว่าไม่ใช่บอต
+
+Docker ใช้ Node.js 22 และเปิด `--js-runtimes node` ทั้งตอนอ่านข้อมูลคลิปและดาวน์โหลด เพื่อรองรับ JavaScript challenges ตาม [เอกสาร yt-dlp](https://github.com/yt-dlp/yt-dlp/wiki/EJS) โดยตัว `yt-dlp` ที่ดาวน์โหลดจาก official release มี EJS scripts รวมอยู่แล้ว ทั้งภาพและเสียงใช้ default clients ของ yt-dlp
+
+1. Push โค้ดที่แก้ไปยัง repository ที่ Render เชื่อมอยู่ แล้ว deploy ใหม่ หาก image ถูก cache ให้ใช้ **Clear build cache & deploy** เพื่อดาวน์โหลด yt-dlp รุ่นล่าสุด
+2. ลองคลิปเดิม หากยังถูกขอ bot verification ให้ตรวจ Render logs ข้อผิดพลาดจาก `/api/info` การมี runtime ไม่ได้รับประกันว่าจะผ่านการตรวจสอบ IP หรือเซสชัน
+3. หากจำเป็นต้องใช้เซสชัน YouTube ให้ export cookies เฉพาะ YouTube เป็น Netscape format ตาม [คำแนะนำทางการ](https://github.com/yt-dlp/yt-dlp/wiki/Extractors#exporting-youtube-cookies) แล้วเพิ่ม Render Secret File ชื่อ `cookies.txt` และ Environment Variable `YTDLP_COOKIES_FILE=/etc/secrets/cookies.txt` จากนั้น deploy ใหม่ แอปจะคัดลอกไปยังไฟล์ชั่วคราวที่มีสิทธิ์ 0600 และใช้กับคำขอ YouTube ทั้งสองขั้นตอน
+
+Cookies เป็นข้อมูลการเข้าสู่ระบบ อย่า commit ลง Git หรือวางใน `public/` และควรใช้บัญชีแยกหากจำเป็น เพราะเว็บจะใช้เซสชันนี้กับคำขอ YouTube ของผู้ใช้ทุกคน เอกสาร yt-dlp เตือนว่าบัญชีอาจถูกจำกัดหรือระงับได้ Cookies อาจหมดอายุหรือใช้ไม่ได้เมื่อเปลี่ยน IP และไม่ได้รับประกันว่าจะแก้ bot verification ได้
+
+ถ้ายังมีปัญหาบน Render แต่รันบนเครื่องตัวเองได้ ให้ใช้แบบ local (`npm start` แล้วเปิด `http://localhost:3000`) หรือเปลี่ยนสภาพแวดล้อมเซิร์ฟเวอร์หลังตรวจ logs หาก logs ระบุว่าไม่มี PO Token ให้ตรวจ [PO Token Guide](https://github.com/yt-dlp/yt-dlp/wiki/PO-Token-Guide) เพิ่มเติม
 
 ## 🛠 โครงสร้างโปรเจกต์ (Project Architecture)
 

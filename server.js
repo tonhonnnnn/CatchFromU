@@ -4,6 +4,24 @@ const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
 const crypto = require('crypto');
+const os = require('os');
+
+// Copy optional server credentials to a private, writable cookie jar.
+// Render secret files may be read-only; yt-dlp saves updated cookies on exit.
+let youtubeCookiesFile;
+if (process.env.YTDLP_COOKIES_FILE) {
+  const cookieDir = fs.mkdtempSync(path.join(os.tmpdir(), 'catchfromu-cookies-'));
+  youtubeCookiesFile = path.join(cookieDir, 'cookies.txt');
+  fs.writeFileSync(youtubeCookiesFile, fs.readFileSync(process.env.YTDLP_COOKIES_FILE), { mode: 0o600 });
+  process.on('exit', () => fs.rmSync(cookieDir, { recursive: true, force: true }));
+}
+
+function youtubeArgs(platform) {
+  if (platform !== 'youtube') return [];
+  const args = ['--js-runtimes', 'node'];
+  if (youtubeCookiesFile) args.push('--cookies', youtubeCookiesFile);
+  return args;
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -116,8 +134,11 @@ function parseYtDlpError(stderr, lang = 'th') {
   if (text.includes('video unavailable') || text.includes('not available')) {
     return lang === 'en' ? 'Video is unavailable or has been removed.' : 'ไม่พบวิดีโอนี้ หรือวิดีโอถูกลบออกไปแล้ว';
   }
-  if (text.includes('sign in to confirm') || text.includes('bot')) {
-    return lang === 'en' ? 'Bot verification required by provider. Please try again in a few moments.' : 'ระบบตรวจพบความถี่การดาวน์โหลด กรุณารอสักครู่แล้วลองใหม่อีกครั้ง';
+  if (text.includes('not a bot') || text.includes('bot verification') || text.includes('confirm you’re not a bot')) {
+    return lang === 'en' ? 'YouTube requires bot verification for this server. The site administrator must check the server connection and YouTube session; retrying may not resolve this.' : 'YouTube ขอให้เซิร์ฟเวอร์ยืนยันว่าไม่ใช่บอต ผู้ดูแลเว็บต้องตรวจสอบการเชื่อมต่อและเซสชัน YouTube การลองใหม่อาจไม่แก้ปัญหานี้';
+  }
+  if (text.includes('sign in to confirm') || text.includes('login required')) {
+    return lang === 'en' ? 'This video requires a signed-in session on the server. Signing in to YouTube in your browser does not sign in this server.' : 'คลิปนี้ต้องใช้เซสชันที่เข้าสู่ระบบบนเซิร์ฟเวอร์ การล็อกอิน YouTube ในเบราว์เซอร์ไม่ได้ล็อกอินให้เซิร์ฟเวอร์';
   }
   if (text.includes('members-only')) {
     return lang === 'en' ? 'This video is for channel members only.' : 'วิดีโอนี้สำหรับสมาชิกเท่านั้น (Members-only)';
@@ -149,6 +170,7 @@ app.get('/api/info', async (req, res) => {
   }
 
   const args = [
+    ...youtubeArgs(platform),
     '--dump-single-json',
     '--no-playlist',
     '--no-warnings',
@@ -316,7 +338,6 @@ app.post('/api/download/start', (req, res) => {
 
   const cleanUrl = url.trim();
   const platform = detectPlatform(cleanUrl);
-  const isYoutube = platform === 'youtube';
 
   const cleanStart = sanitizeTime(startTime);
   const cleanEnd = sanitizeTime(endTime);
@@ -358,6 +379,7 @@ app.post('/api/download/start', (req, res) => {
 
   // Build yt-dlp arguments
   let ytArgs = [
+    ...youtubeArgs(platform),
     '--newline',
     '--no-playlist'
   ];
@@ -369,9 +391,6 @@ app.post('/api/download/start', (req, res) => {
   }
 
   if (type === 'audio') {
-    if (isYoutube) {
-      ytArgs.push('--extractor-args', 'youtube:player_client=android,web');
-    }
     ytArgs.push('-f', 'ba/b');
     if (format === 'm4a') {
       ytArgs.push('-x');

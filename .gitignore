@@ -16,3 +16,8 @@ downloads/*
 *.webm
 *.part
 *.ytdl
+
+# YouTube session credentials
+cookies*.txt
+.env
+.env.*
