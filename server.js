@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { spawn, spawnSync } = require('child_process');
 const crypto = require('crypto');
 const os = require('os');
 
@@ -173,7 +173,6 @@ app.get('/api/info', async (req, res) => {
     ...youtubeArgs(platform),
     '--dump-single-json',
     '--no-playlist',
-    '--no-warnings',
     cleanUrl
   ];
 
@@ -744,5 +743,7 @@ setInterval(() => {
 }, 5 * 60 * 1000);
 
 app.listen(PORT, () => {
+  const engineVersion = spawnSync('yt-dlp', ['--version'], { encoding: 'utf8', timeout: 5000 });
+  console.log(`Download engine: yt-dlp ${(engineVersion.stdout || '').trim() || 'unavailable'}, Node ${process.version}, YouTube session ${youtubeCookiesFile ? 'configured' : 'anonymous'}`);
   console.log(`CatchFromU running on http://localhost:${PORT}`);
 });
