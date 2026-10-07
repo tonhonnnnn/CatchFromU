@@ -54,6 +54,8 @@ npm start
 npm run dev
 ```
 
+สำหรับใช้บน Mac เมื่อการเชื่อมต่อ Render ถูก YouTube จำกัด ให้รัน `npm run local` แล้วเปิด `http://localhost:3000` คำสั่งนี้รับการเชื่อมต่อเฉพาะเครื่องตัวเอง และดาวน์โหลดผ่านเครือข่ายของ Mac
+
 ### 3. เปิดใช้งานบนเบราว์เซอร์
 เปิดเบราว์เซอร์แล้วไปที่:
 👉 **[http://localhost:3000](http://localhost:3000)** หรือ **[http://localhost:3000/en](http://localhost:3000/en)**

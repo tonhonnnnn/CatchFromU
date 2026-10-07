@@ -128,6 +128,12 @@ function sanitizeTime(timeStr) {
 // Parse yt-dlp error output
 function parseYtDlpError(stderr, lang = 'th') {
   const text = (stderr || '').toLowerCase();
+  if (text.includes('http error 429') || text.includes('too many requests')) {
+    return lang === 'en' ? 'YouTube is rate-limiting this server connection (HTTP 429). Use the local app or contact the site administrator to resolve the server connection.' : 'YouTube จำกัดคำขอจากการเชื่อมต่อของเซิร์ฟเวอร์นี้ (HTTP 429) กรุณาใช้แอปบนเครื่อง หรือให้ผู้ดูแลเว็บแก้การเชื่อมต่อเซิร์ฟเวอร์';
+  }
+  if (text.includes('http error 403')) {
+    return lang === 'en' ? 'The provider denied access from this server (HTTP 403). The site administrator must check the server connection and session.' : 'ผู้ให้บริการปฏิเสธการเข้าถึงจากเซิร์ฟเวอร์นี้ (HTTP 403) ผู้ดูแลเว็บต้องตรวจสอบการเชื่อมต่อและเซสชัน';
+  }
   if (text.includes('private video')) {
     return lang === 'en' ? 'This video is private and cannot be downloaded.' : 'วิดีโอนี้เป็นแบบส่วนตัว (Private Video) ไม่สามารถดาวน์โหลดได้';
   }
@@ -742,7 +748,7 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
-app.listen(PORT, () => {
+app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
   const engineVersion = spawnSync('yt-dlp', ['--version'], { encoding: 'utf8', timeout: 5000 });
   console.log(`Download engine: yt-dlp ${(engineVersion.stdout || '').trim() || 'unavailable'}, Node ${process.version}, YouTube session ${youtubeCookiesFile ? 'configured' : 'anonymous'}`);
   console.log(`CatchFromU running on http://localhost:${PORT}`);
